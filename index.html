@@ -1,0 +1,1638 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Executivo | Ciclo de Obrigações</title>
+  <style>
+    :root {
+      --bg: #f2f7fc;
+      --bg-strong: #deebf7;
+      --surface: #ffffff;
+      --text: #0f2747;
+      --muted: #5b6f88;
+      --line: #d1ddec;
+      --line-soft: #e1eaf5;
+      --primary: #0f62fe;
+      --primary-soft: #dce8ff;
+      --good: #108455;
+      --warn: #d6811d;
+      --bad: #c5443b;
+      --shadow: 0 14px 32px rgba(16, 37, 66, 0.10);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", "Tahoma", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 16%, rgba(15, 98, 254, 0.16) 0%, rgba(15, 98, 254, 0) 42%),
+        radial-gradient(circle at 92% 12%, rgba(0, 154, 154, 0.16) 0%, rgba(0, 154, 154, 0) 36%),
+        linear-gradient(160deg, var(--bg) 0%, #eef4fa 56%, var(--bg-strong) 100%);
+      background-attachment: fixed;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1380px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .hero h1 {
+      font-family: "Bahnschrift", "Segoe UI", sans-serif;
+      font-size: clamp(1.4rem, 2.2vw, 2.05rem);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 0.94rem;
+      max-width: 760px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      box-shadow: 0 8px 18px rgba(16, 37, 66, 0.07);
+    }
+
+    .badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-soft);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid #dfe8f3;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .upload {
+      display: grid;
+      grid-template-columns: 2.1fr 1fr;
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .dropzone {
+      border: 2px dashed #b6c9df;
+      border-radius: var(--radius-md);
+      min-height: 138px;
+      padding: 18px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+      transition: 0.2s ease;
+      cursor: pointer;
+    }
+
+    .dropzone:hover,
+    .dropzone.is-over {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #edf4ff 0%, #e4efff 100%);
+      transform: translateY(-1px);
+    }
+
+    .dropzone h3 {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #26466f;
+    }
+
+    .dropzone p {
+      color: #5b7698;
+      font-size: 0.92rem;
+    }
+
+    .upload__actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn--primary {
+      color: #fff;
+      border-color: #2d67b9;
+      background: linear-gradient(180deg, #3f84e4 0%, #1f65d2 100%);
+      box-shadow: 0 8px 18px rgba(31, 101, 210, 0.24);
+    }
+
+    .btn--ghost {
+      color: #2b4f7f;
+      border-color: #c4d6e9;
+      background: #f4f9ff;
+    }
+
+    .upload__meta {
+      border: 1px solid #cfe0f1;
+      border-radius: var(--radius-md);
+      background: #f5faff;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .upload__meta h4 {
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #4a668d;
+      font-weight: 800;
+    }
+
+    .upload__meta p {
+      font-size: 0.92rem;
+      color: #56749a;
+      line-height: 1.4;
+    }
+
+    .upload__meta p strong {
+      color: #274c7d;
+    }
+
+    .upload__meta .warn {
+      color: #ca7618;
+      font-weight: 700;
+    }
+
+    .tabs {
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      border: 1px solid #c2d4e8;
+      background: #f5f9ff;
+      color: #2a4d7a;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(180deg, #3d82e2 0%, #1f65d2 100%);
+      border-color: #2d66ba;
+      color: #fff;
+    }
+
+    .filters {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .filters__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filters__title {
+      font-family: "Sora", "Segoe UI", sans-serif;
+      font-size: 0.98rem;
+      color: #193e67;
+    }
+
+    .filters__grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 0.73rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 800;
+      color: #486687;
+    }
+
+    .field select,
+    .field input {
+      width: 100%;
+      border: 1px solid #cddbeb;
+      border-radius: 9px;
+      background: #fff;
+      color: #20486f;
+      padding: 9px 10px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .field select:focus,
+    .field input:focus {
+      border-color: #0f62fe;
+      box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.14);
+    }
+
+    .filters__summary {
+      color: #466687;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .kpi {
+      border: 1px solid #dbe6f2;
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+      padding: 12px;
+      min-height: 108px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .kpi__label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 800;
+      color: #4b6788;
+    }
+
+    .kpi__value {
+      font-size: 1.85rem;
+      line-height: 1;
+      font-weight: 800;
+      color: #163f72;
+    }
+
+    .kpi__note {
+      font-size: 0.8rem;
+      color: #617fa4;
+      font-weight: 600;
+    }
+
+    .kpi.good .kpi__value { color: var(--good); }
+    .kpi.warn .kpi__value { color: var(--warn); }
+    .kpi.bad .kpi__value { color: var(--bad); }
+
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .chart-panel {
+      border: 1px solid #dbe6f2;
+      border-radius: var(--radius-md);
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 4px;
+      min-height: 320px;
+    }
+
+    .chart-panel h3 {
+      font-size: 0.9rem;
+      color: #1e4776;
+      font-weight: 700;
+    }
+
+    .chart-panel p {
+      color: #6281a6;
+      font-size: 0.78rem;
+    }
+
+    .chart-panel canvas {
+      width: 100% !important;
+      height: 220px !important;
+    }
+
+    .chart-panel .fallback {
+      border: 1px dashed #c1d3e8;
+      border-radius: var(--radius-sm);
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+      color: #6d86a7;
+      font-size: 0.84rem;
+      background: #f5f9ff;
+    }
+
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .panel-inner {
+      border: 1px solid #dee8f3;
+      border-radius: var(--radius-md);
+      background: #fbfdff;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .panel-inner h3 {
+      font-size: 0.9rem;
+      color: #274d7f;
+      font-weight: 700;
+    }
+
+    .panel-inner ul {
+      padding-left: 16px;
+      display: grid;
+      gap: 6px;
+      color: #406188;
+      font-size: 0.84rem;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid #d8e4f1;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      max-height: 480px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 780px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #e5edf7;
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 0.8rem;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f2f7fd;
+      color: #476689;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    th.sortable { cursor: pointer; }
+    th.sortable::after { content: "↕"; margin-left: 6px; opacity: 0.4; }
+    th.sortable.asc::after { content: "↑"; opacity: 0.8; }
+    th.sortable.desc::after { content: "↓"; opacity: 0.8; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .p-good { background: #e8f7ef; border-color: #bde6d0; color: #177847; }
+    .p-warn { background: #fff4e6; border-color: #f7d4a8; color: #905519; }
+    .p-bad  { background: #ffeae8; border-color: #f5c5c1; color: #912f2a; }
+    .p-info { background: #eaf2ff; border-color: #c7daf4; color: #2a527d; }
+    .p-na   { background: #eef2f6; border-color: #d8e1ea; color: #596674; }
+
+    .table-tools {
+      display: grid;
+      grid-template-columns: 1.8fr auto auto auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .pager {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .pager .meta {
+      font-size: 0.8rem;
+      color: #607da1;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .empty {
+      border: 1px dashed #c4d7ec;
+      border-radius: var(--radius-md);
+      background: #f5f9ff;
+      color: #5f7ea2;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1180px) {
+      .filters__grid { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
+      .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .charts { grid-template-columns: 1fr; }
+      .analysis-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 860px) {
+      body { padding: 12px; }
+      .upload { grid-template-columns: 1fr; }
+      .filters__grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .table-tools { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .filters__grid { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div>
+        <h1>Dashboard Executivo | Ciclo de Obrigações</h1>
+        <p>Upload do Excel para análise automática por aba. Cada planilha vira uma visão com KPIs, insights, gráficos e detalhamento.</p>
+      </div>
+      <div class="badge" id="statusBadge">Aguardando upload</div>
+    </header>
+
+    <section class="card upload">
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Importar arquivo Excel">
+        <h3>Importar arquivo Excel</h3>
+        <p>Arraste e solte ou selecione o arquivo <strong>Ciclo de Obrigações 2025-2026_v00.xlsx</strong></p>
+        <div class="upload__actions">
+          <button id="selectFileBtn" class="btn btn--primary" type="button">Selecionar arquivo</button>
+          <button id="resetBtn" class="btn btn--ghost" type="button">Limpar dashboard</button>
+        </div>
+        <p id="fileMeta">Nenhum arquivo carregado</p>
+        <input id="fileInput" type="file" accept=".xlsx,.xlsm,.xls,.csv" hidden />
+      </div>
+
+      <aside class="upload__meta">
+        <h4>Status da análise</h4>
+        <p id="statusMessage">Aguardando arquivo para iniciar a leitura das abas.</p>
+        <p><strong>Última atualização:</strong> <span id="lastUpdate">-</span></p>
+        <p class="warn">Sem dependência de data.json. Leitura direta do Excel via JavaScript.</p>
+      </aside>
+    </section>
+
+    <section id="tabsCard" class="card hidden">
+      <div id="tabsBar" class="tabs"></div>
+    </section>
+
+    <section id="dashboardCard" class="card hidden" style="padding: 14px; display: grid; gap: 12px;">
+      <section class="filters card" style="box-shadow:none; border-radius:14px;">
+        <div class="filters__head">
+          <h2 class="filters__title" id="sheetTitle">Filtros por aba</h2>
+          <button id="clearFiltersBtn" class="btn btn--ghost" type="button">Limpar filtros</button>
+        </div>
+        <div class="filters__grid">
+          <div class="field">
+            <label for="yearFilter">Ano</label>
+            <select id="yearFilter"><option value="__ALL__">Todos</option></select>
+          </div>
+          <div class="field">
+            <label for="monthFilter">Mês</label>
+            <select id="monthFilter"><option value="__ALL__">Todos</option></select>
+          </div>
+          <div class="field">
+            <label for="statusFilter">Status</label>
+            <select id="statusFilter"><option value="__ALL__">Todos</option></select>
+          </div>
+          <div class="field">
+            <label for="ownerFilter">Responsável</label>
+            <select id="ownerFilter"><option value="__ALL__">Todos</option></select>
+          </div>
+          <div class="field">
+            <label for="categoryFilter">Categoria / Processo</label>
+            <select id="categoryFilter"><option value="__ALL__">Todos</option></select>
+          </div>
+          <div class="field">
+            <label for="tableSearch">Busca textual</label>
+            <input id="tableSearch" type="text" placeholder="buscar no detalhe..." />
+          </div>
+        </div>
+        <p class="filters__summary" id="filtersSummary">Sem filtros ativos.</p>
+      </section>
+
+      <section class="kpis" id="kpiGrid"></section>
+
+      <section class="charts">
+        <article class="chart-panel">
+          <h3>Status padronizado</h3>
+          <p>Distribuição dos registros no recorte atual</p>
+          <canvas id="statusChart"></canvas>
+        </article>
+        <article class="chart-panel">
+          <h3>Tendência mensal</h3>
+          <p>Quantidade de registros por mês (data principal)</p>
+          <canvas id="trendChart"></canvas>
+        </article>
+        <article class="chart-panel">
+          <h3>Top responsáveis com pendências</h3>
+          <p>Não inclui Concluída e Não aplicável</p>
+          <canvas id="ownerChart"></canvas>
+        </article>
+        <article class="chart-panel">
+          <h3>Qualidade (nulos por coluna)</h3>
+          <p>Top 10 colunas com maior volume de ausências</p>
+          <canvas id="qualityChart"></canvas>
+        </article>
+      </section>
+
+      <section class="analysis-grid">
+        <article class="panel-inner">
+          <h3>Insights automáticos da aba</h3>
+          <ul id="insightsList"></ul>
+        </article>
+        <article class="panel-inner">
+          <h3>Dicionário de colunas (inferido)</h3>
+          <div class="table-wrap" style="max-height: 240px;">
+            <table>
+              <thead><tr><th>Coluna</th><th>Tipo</th><th>Nulos</th><th>Distintos</th></tr></thead>
+              <tbody id="dictionaryBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel-inner">
+        <h3>Tabela detalhada</h3>
+        <div class="table-tools">
+          <div class="field">
+            <label for="pageSize">Linhas por página</label>
+            <select id="pageSize">
+              <option>10</option>
+              <option selected>25</option>
+              <option>50</option>
+              <option>100</option>
+            </select>
+          </div>
+          <div class="pager"><span class="meta" id="tableMeta">0 registros</span></div>
+          <div class="pager">
+            <button id="prevPageBtn" class="btn btn--ghost" type="button">Anterior</button>
+            <button id="nextPageBtn" class="btn btn--ghost" type="button">Próximo</button>
+          </div>
+          <div class="pager">
+            <button id="exportCsvBtn" class="btn btn--ghost" type="button">Exportar CSV filtrado</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="detailTable">
+            <thead id="detailHead"></thead>
+            <tbody id="detailBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="emptyState" class="empty">
+      Carregue o Excel para gerar as abas automaticamente e abrir os painéis de análise.
+    </section>
+  </main>
+
+  <script src="./vendor/xlsx.full.min.js"></script>
+  <script src="./vendor/chart.umd.js"></script>
+  <script>
+    const FILTER_ALL = "__ALL__";
+    const STATUS_ORDER = ["Concluída", "Não iniciada", "Em tratamento", "Ação corretiva (RTA)", "Não aplicável", "Não classificado"];
+    const STATUS_COLORS = {
+      "Concluída": "#108455",
+      "Não iniciada": "#d6811d",
+      "Em tratamento": "#3a78c2",
+      "Ação corretiva (RTA)": "#c5443b",
+      "Não aplicável": "#7a8797",
+      "Não classificado": "#9aa7b7"
+    };
+
+    const state = {
+      workbookName: "",
+      workbookSheets: [],
+      byName: {},
+      active: null,
+      filters: {
+        year: FILTER_ALL,
+        month: FILTER_ALL,
+        status: FILTER_ALL,
+        owner: FILTER_ALL,
+        category: FILTER_ALL
+      },
+      table: {
+        search: "",
+        pageSize: 25,
+        page: 1,
+        sortKey: "__rowIndex",
+        sortDir: "asc"
+      },
+      charts: {}
+    };
+
+    const refs = {
+      dropzone: document.getElementById("dropzone"),
+      fileInput: document.getElementById("fileInput"),
+      selectFileBtn: document.getElementById("selectFileBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      fileMeta: document.getElementById("fileMeta"),
+      statusBadge: document.getElementById("statusBadge"),
+      statusMessage: document.getElementById("statusMessage"),
+      lastUpdate: document.getElementById("lastUpdate"),
+      tabsCard: document.getElementById("tabsCard"),
+      tabsBar: document.getElementById("tabsBar"),
+      dashboardCard: document.getElementById("dashboardCard"),
+      emptyState: document.getElementById("emptyState"),
+      sheetTitle: document.getElementById("sheetTitle"),
+      clearFiltersBtn: document.getElementById("clearFiltersBtn"),
+      yearFilter: document.getElementById("yearFilter"),
+      monthFilter: document.getElementById("monthFilter"),
+      statusFilter: document.getElementById("statusFilter"),
+      ownerFilter: document.getElementById("ownerFilter"),
+      categoryFilter: document.getElementById("categoryFilter"),
+      tableSearch: document.getElementById("tableSearch"),
+      filtersSummary: document.getElementById("filtersSummary"),
+      kpiGrid: document.getElementById("kpiGrid"),
+      insightsList: document.getElementById("insightsList"),
+      dictionaryBody: document.getElementById("dictionaryBody"),
+      pageSize: document.getElementById("pageSize"),
+      prevPageBtn: document.getElementById("prevPageBtn"),
+      nextPageBtn: document.getElementById("nextPageBtn"),
+      tableMeta: document.getElementById("tableMeta"),
+      detailHead: document.getElementById("detailHead"),
+      detailBody: document.getElementById("detailBody"),
+      exportCsvBtn: document.getElementById("exportCsvBtn")
+    };
+
+    function nowString() {
+      return new Date().toLocaleString("pt-BR");
+    }
+
+    function setStatus(text, mode = "info") {
+      refs.statusMessage.textContent = text;
+      refs.statusBadge.textContent = text.length > 58 ? `${text.slice(0, 58)}...` : text;
+      refs.statusBadge.style.borderColor = mode === "ok" ? "#b9dfca" : mode === "warn" ? "#f0d3a9" : mode === "bad" ? "#efc1bc" : "#cddbeb";
+      refs.statusBadge.style.background = mode === "ok" ? "#ecfaf3" : mode === "warn" ? "#fff5e7" : mode === "bad" ? "#fff0ee" : "#ffffff";
+      refs.statusBadge.style.color = mode === "ok" ? "#177847" : mode === "warn" ? "#91561b" : mode === "bad" ? "#8e2f29" : "#5b6f88";
+    }
+
+    function cleanText(v) {
+      if (v === null || v === undefined) return "";
+      return String(v).replace(/\r|\n/g, " ").replace(/\s+/g, " ").trim();
+    }
+
+    function normalizeText(v) {
+      return cleanText(v)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    }
+
+    function parseNumber(v) {
+      if (typeof v === "number" && Number.isFinite(v)) return v;
+      const s = cleanText(v);
+      if (!s) return null;
+      const normalized = s.replace(/\./g, "").replace(/,/g, ".").replace(/[^0-9\-.]/g, "");
+      if (!normalized) return null;
+      const n = Number(normalized);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function parseDate(v) {
+      if (v instanceof Date && !Number.isNaN(v.getTime())) return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+      if (typeof v === "number" && Number.isFinite(v) && typeof XLSX !== "undefined" && XLSX.SSF) {
+        const obj = XLSX.SSF.parse_date_code(v);
+        if (obj && obj.y >= 1900 && obj.y <= 2100) return new Date(obj.y, obj.m - 1, obj.d);
+      }
+      const s = cleanText(v);
+      if (!s) return null;
+      const dmy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      if (dmy) {
+        const d = Number(dmy[1]);
+        const m = Number(dmy[2]);
+        let y = Number(dmy[3]);
+        if (y < 100) y += 2000;
+        const dt = new Date(y, m - 1, d);
+        if (dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d) return dt;
+      }
+      const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (iso) {
+        const y = Number(iso[1]);
+        const m = Number(iso[2]);
+        const d = Number(iso[3]);
+        const dt = new Date(y, m - 1, d);
+        if (!Number.isNaN(dt.getTime())) return dt;
+      }
+      return null;
+    }
+
+    function formatDate(dt) {
+      if (!(dt instanceof Date) || Number.isNaN(dt.getTime())) return "Não informado";
+      return dt.toLocaleDateString("pt-BR");
+    }
+
+    function monthKeyFromDate(dt) {
+      if (!(dt instanceof Date) || Number.isNaN(dt.getTime())) return null;
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, "0");
+      return `${y}-${m}`;
+    }
+
+    function monthLabel(key) {
+      if (!key) return "Sem data";
+      const [y, m] = key.split("-");
+      const idx = Number(m);
+      return `${new Date(2000, idx - 1, 1).toLocaleDateString("pt-BR", { month: "short" })}/${y}`;
+    }
+
+    function looksLikeBoolean(v) {
+      const n = normalizeText(v);
+      return ["sim", "nao", "não", "true", "false", "0", "1", "ok"].includes(n);
+    }
+
+    function normalizeStatus(raw) {
+      const n = normalizeText(raw);
+      if (!n) return "Não classificado";
+      if (["respondida", "concluida", "concluído", "concluido", "finalizada", "revisitada"].includes(n)) return "Concluída";
+      if (["nao respondida", "não respondida", "nao iniciada", "não iniciada", "pendente"].includes(n)) return "Não iniciada";
+      if (["transferir", "devolver", "em andamento", "em analise", "em análise", "analise", "analisado", "retornar com ponto focal", "validar com sandra"].includes(n)) return "Em tratamento";
+      if (["aberto rta", "abrir rta", "rta"].includes(n)) return "Ação corretiva (RTA)";
+      if (["ciente", "ciente - n/a", "n/a", "na", "nao aplicavel", "não aplicável"].includes(n)) return "Não aplicável";
+      return cleanText(raw);
+    }
+
+    function dedupeHeaders(headers) {
+      const used = new Map();
+      return headers.map((h, i) => {
+        const base = cleanText(h) || `Coluna ${i + 1}`;
+        const key = normalizeText(base) || `coluna_${i + 1}`;
+        const count = used.get(key) || 0;
+        used.set(key, count + 1);
+        return count ? `${base} (${count + 1})` : base;
+      });
+    }
+
+    function detectHeaderRow(matrix) {
+      const scan = Math.min(matrix.length, 30);
+      let bestIndex = 0;
+      let bestScore = -1;
+      for (let i = 0; i < scan; i += 1) {
+        const row = matrix[i] || [];
+        const nonEmpty = row.filter((v) => cleanText(v) !== "").length;
+        if (nonEmpty > bestScore) {
+          bestScore = nonEmpty;
+          bestIndex = i;
+        }
+      }
+      return bestIndex;
+    }
+
+    function findColumnByKeywords(headers, keywords) {
+      for (const h of headers) {
+        const n = normalizeText(h);
+        if (keywords.some((k) => n.includes(k))) return h;
+      }
+      return null;
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function initInteractions() {
+      refs.selectFileBtn.addEventListener("click", () => refs.fileInput.click());
+      refs.fileInput.addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) processFile(file);
+      });
+
+      refs.resetBtn.addEventListener("click", resetDashboard);
+
+      refs.dropzone.addEventListener("click", (event) => {
+        if (event.target.id !== "selectFileBtn") refs.fileInput.click();
+      });
+
+      refs.dropzone.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          refs.fileInput.click();
+        }
+      });
+
+      ["dragenter", "dragover"].forEach((evt) => {
+        refs.dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          refs.dropzone.classList.add("is-over");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((evt) => {
+        refs.dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          refs.dropzone.classList.remove("is-over");
+        });
+      });
+
+      refs.dropzone.addEventListener("drop", (event) => {
+        const file = event.dataTransfer.files && event.dataTransfer.files[0];
+        if (file) processFile(file);
+      });
+
+      [refs.yearFilter, refs.monthFilter, refs.statusFilter, refs.ownerFilter, refs.categoryFilter].forEach((select) => {
+        select.addEventListener("change", () => {
+          state.filters = {
+            year: refs.yearFilter.value,
+            month: refs.monthFilter.value,
+            status: refs.statusFilter.value,
+            owner: refs.ownerFilter.value,
+            category: refs.categoryFilter.value
+          };
+          state.table.page = 1;
+          renderActiveSheet();
+        });
+      });
+
+      refs.clearFiltersBtn.addEventListener("click", () => {
+        state.filters = {
+          year: FILTER_ALL,
+          month: FILTER_ALL,
+          status: FILTER_ALL,
+          owner: FILTER_ALL,
+          category: FILTER_ALL
+        };
+        refs.yearFilter.value = FILTER_ALL;
+        refs.monthFilter.value = FILTER_ALL;
+        refs.statusFilter.value = FILTER_ALL;
+        refs.ownerFilter.value = FILTER_ALL;
+        refs.categoryFilter.value = FILTER_ALL;
+        refs.tableSearch.value = "";
+        state.table.search = "";
+        state.table.page = 1;
+        renderActiveSheet();
+      });
+
+      refs.tableSearch.addEventListener("input", (e) => {
+        state.table.search = e.target.value || "";
+        state.table.page = 1;
+        renderTable();
+      });
+
+      refs.pageSize.addEventListener("change", (e) => {
+        state.table.pageSize = Number(e.target.value || 25);
+        state.table.page = 1;
+        renderTable();
+      });
+
+      refs.prevPageBtn.addEventListener("click", () => {
+        state.table.page = Math.max(1, state.table.page - 1);
+        renderTable();
+      });
+
+      refs.nextPageBtn.addEventListener("click", () => {
+        state.table.page += 1;
+        renderTable();
+      });
+
+      refs.exportCsvBtn.addEventListener("click", exportFilteredCsv);
+    }
+    async function processFile(file) {
+      if (typeof XLSX === "undefined") {
+        setStatus("Biblioteca XLSX não carregou. Verifique conexão para usar a leitura do Excel.", "bad");
+        return;
+      }
+
+      setStatus("Lendo arquivo e estruturando abas...", "info");
+      refs.fileMeta.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: "array", cellDates: true, raw: true });
+        if (!workbook.SheetNames || !workbook.SheetNames.length) {
+          throw new Error("Nenhuma planilha encontrada no arquivo.");
+        }
+
+        const sheets = workbook.SheetNames.map((name) => {
+          const ws = workbook.Sheets[name];
+          const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: false });
+          const analysis = analyzeSheet(name, matrix);
+          return { name, matrix, analysis };
+        });
+
+        state.workbookName = file.name;
+        state.workbookSheets = sheets;
+        state.byName = Object.fromEntries(sheets.map((s) => [s.name, s]));
+
+        buildTabs();
+        openSheetTab(sheets[0].name);
+
+        refs.tabsCard.classList.remove("hidden");
+        refs.dashboardCard.classList.remove("hidden");
+        refs.emptyState.classList.add("hidden");
+        refs.lastUpdate.textContent = nowString();
+        setStatus(`Arquivo processado: ${sheets.length} abas analisadas.`, "ok");
+      } catch (err) {
+        console.error(err);
+        setStatus(`Falha ao ler arquivo: ${err.message || err}`, "bad");
+      }
+    }
+
+    function analyzeSheet(sheetName, matrixRaw) {
+      const matrix = Array.isArray(matrixRaw) ? matrixRaw : [];
+      if (!matrix.length) {
+        return {
+          sheetName,
+          headerRowIndex: 0,
+          headers: [],
+          records: [],
+          profiles: [],
+          qualityTopMissing: [],
+          keyColumns: {},
+          displayColumns: [],
+          summary: { totalRows: 0, totalColumns: 0, completion: 0, duplicateIds: 0 }
+        };
+      }
+
+      const headerRowIndex = detectHeaderRow(matrix);
+      const headerRaw = matrix[headerRowIndex] || [];
+      const headers = dedupeHeaders(headerRaw.map((h) => cleanText(h)));
+
+      const rows = [];
+      for (let i = headerRowIndex + 1; i < matrix.length; i += 1) {
+        const row = matrix[i] || [];
+        const nonEmpty = row.some((v) => cleanText(v) !== "");
+        if (!nonEmpty) continue;
+        const obj = { __rowIndex: i + 1 };
+        headers.forEach((h, idx) => {
+          obj[h] = row[idx] ?? null;
+        });
+        rows.push(obj);
+      }
+
+      const keyColumns = detectKeyColumns(headers, rows);
+      const records = rows.map((r) => enrichRecord(r, keyColumns));
+      const profiles = buildColumnProfiles(headers, records);
+      const qualityTopMissing = [...profiles].sort((a, b) => b.missing - a.missing).slice(0, 10);
+      const displayColumns = pickDisplayColumns(headers, keyColumns);
+
+      const idCol = keyColumns.idCol;
+      let duplicateIds = 0;
+      if (idCol) {
+        const map = new Map();
+        records.forEach((r) => {
+          const id = cleanText(r[idCol]);
+          if (!id) return;
+          map.set(id, (map.get(id) || 0) + 1);
+        });
+        duplicateIds = [...map.values()].filter((n) => n > 1).length;
+      }
+
+      const filledCells = profiles.reduce((acc, p) => acc + p.nonEmpty, 0);
+      const totalCells = Math.max(1, records.length * Math.max(1, headers.length));
+
+      const insights = buildInsights(sheetName, records, profiles, keyColumns, headerRowIndex, duplicateIds);
+
+      return {
+        sheetName,
+        headerRowIndex,
+        headers,
+        records,
+        profiles,
+        qualityTopMissing,
+        keyColumns,
+        displayColumns,
+        insights,
+        summary: {
+          totalRows: records.length,
+          totalColumns: headers.length,
+          completion: filledCells / totalCells,
+          duplicateIds
+        }
+      };
+    }
+
+    function detectKeyColumns(headers, rows) {
+      const statusCol = findColumnByKeywords(headers, ["status", "situacao", "situação"]);
+      const ownerCol = findColumnByKeywords(headers, ["responsavel", "responsável", "ponto focal"]);
+      const processCol = findColumnByKeywords(headers, ["processo", "area", "área", "assunto", "categoria", "ementa", "requisito"]);
+      const evidenceCol = findColumnByKeywords(headers, ["evid", "link"]);
+      const idCol = findColumnByKeywords(headers, ["codigo", "código", "id", "chave"]);
+      const textCol = findColumnByKeywords(headers, ["obrigacao", "obrigação", "descricao", "descrição", "texto"]);
+
+      const dateCandidates = headers.filter((h) => {
+        const hn = normalizeText(h);
+        if (hn.includes("data") || hn.includes("date") || hn.includes("prazo") || hn.includes("venc")) return true;
+        const sample = rows.slice(0, 120).map((r) => r[h]).filter((v) => cleanText(v) !== "");
+        const dateHits = sample.filter((v) => parseDate(v)).length;
+        return sample.length > 0 && dateHits / sample.length >= 0.55;
+      });
+
+      let dateCol = null;
+      if (dateCandidates.length === 1) {
+        dateCol = dateCandidates[0];
+      } else if (dateCandidates.length > 1) {
+        dateCol = dateCandidates
+          .map((c) => ({ c, score: rows.filter((r) => parseDate(r[c])).length }))
+          .sort((a, b) => b.score - a.score)[0].c;
+      }
+
+      const categoryCol = processCol || headers.find((h) => {
+        if ([statusCol, ownerCol, idCol, dateCol].includes(h)) return false;
+        const values = rows.map((r) => cleanText(r[h])).filter(Boolean);
+        if (!values.length) return false;
+        const distinct = new Set(values.map((v) => v.toLowerCase())).size;
+        return distinct > 1 && distinct <= Math.min(40, Math.ceil(rows.length * 0.35));
+      }) || null;
+
+      return { statusCol, ownerCol, processCol, evidenceCol, idCol, textCol, dateCol, categoryCol };
+    }
+
+    function enrichRecord(record, keys) {
+      const statusRaw = keys.statusCol ? record[keys.statusCol] : null;
+      const status = normalizeStatus(statusRaw);
+      const owner = keys.ownerCol ? (cleanText(record[keys.ownerCol]) || "Não informado") : "Não informado";
+      const category = keys.categoryCol ? (cleanText(record[keys.categoryCol]) || "Não informado") : "Não informado";
+      const dt = keys.dateCol ? parseDate(record[keys.dateCol]) : null;
+      const year = dt ? String(dt.getFullYear()) : "Sem data";
+      const month = dt ? monthKeyFromDate(dt) : "Sem data";
+      const evidenceRaw = keys.evidenceCol ? cleanText(record[keys.evidenceCol]) : "";
+      const hasEvidence = evidenceRaw && !["n/a", "na", "não", "nao", "0"].includes(normalizeText(evidenceRaw)) ? "Sim" : "Não";
+
+      return {
+        ...record,
+        __status: status,
+        __owner: owner,
+        __category: category,
+        __date: dt,
+        __year: year,
+        __month: month,
+        __hasEvidence: hasEvidence,
+        __pending: !["Concluída", "Não aplicável"].includes(status)
+      };
+    }
+
+    function inferType(values) {
+      if (!values.length) return "vazio";
+      let num = 0;
+      let dat = 0;
+      let boo = 0;
+      values.forEach((v) => {
+        if (parseDate(v)) dat += 1;
+        if (parseNumber(v) !== null) num += 1;
+        if (looksLikeBoolean(v)) boo += 1;
+      });
+      const n = values.length;
+      if (dat / n >= 0.6) return "data";
+      if (num / n >= 0.7) return "número";
+      if (boo / n >= 0.75) return "booleano";
+      return "texto";
+    }
+
+    function buildColumnProfiles(headers, records) {
+      return headers.map((h) => {
+        const vals = records.map((r) => r[h]);
+        const nonEmptyVals = vals.map((v) => cleanText(v)).filter(Boolean);
+        const distinct = new Set(nonEmptyVals.map((v) => v.toLowerCase())).size;
+        return {
+          name: h,
+          type: inferType(nonEmptyVals.slice(0, 240)),
+          nonEmpty: nonEmptyVals.length,
+          missing: records.length - nonEmptyVals.length,
+          distinct
+        };
+      });
+    }
+
+    function pickDisplayColumns(headers, keys) {
+      const list = [keys.idCol, keys.statusCol, keys.categoryCol, keys.ownerCol, keys.dateCol, keys.evidenceCol, keys.textCol]
+        .filter((x) => x && headers.includes(x));
+      for (const h of headers) {
+        if (list.length >= 8) break;
+        if (!list.includes(h)) list.push(h);
+      }
+      return list;
+    }
+
+    function buildInsights(sheetName, records, profiles, keys, headerRowIndex, duplicateIds) {
+      const statusCounts = countBy(records, (r) => r.__status);
+      const majorStatus = [...statusCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+      const total = records.length;
+      const completion = profiles.reduce((acc, p) => acc + p.nonEmpty, 0) / Math.max(1, total * Math.max(1, profiles.length));
+      const missingTop = [...profiles].sort((a, b) => b.missing - a.missing)[0];
+      const owners = keys.ownerCol ? new Set(records.map((r) => r.__owner)).size : 0;
+
+      const items = [
+        `Aba analisada: ${sheetName}. Cabeçalho detectado na linha ${headerRowIndex + 1}.`,
+        `Registros válidos no detalhe: ${total}. Colunas úteis: ${profiles.length}.`,
+        `Completude estimada da aba: ${(completion * 100).toFixed(1).replace(".", ",")}% das células preenchidas.`
+      ];
+
+      if (majorStatus) {
+        items.push(`Status predominante: ${majorStatus[0]} (${majorStatus[1]} registros).`);
+      }
+      if (missingTop) {
+        items.push(`Maior ausência: coluna "${missingTop.name}" com ${missingTop.missing} nulos.`);
+      }
+      if (duplicateIds > 0) {
+        items.push(`Foram detectados ${duplicateIds} IDs duplicados na coluna de identificação.`);
+      }
+      if (keys.ownerCol) {
+        items.push(`Responsáveis distintos no recorte: ${owners}.`);
+      }
+      if (!keys.dateCol) {
+        items.push("Não foi detectada coluna de data principal; tendências mensais podem ficar limitadas nesta aba.");
+      }
+      if (!keys.statusCol) {
+        items.push("Não foi detectada coluna de status explícita; alguns KPIs são estimados como " + "Não classificado" + ".");
+      }
+
+      return items;
+    }
+
+    function countBy(items, keyFn) {
+      const map = new Map();
+      items.forEach((item) => {
+        const key = keyFn(item) || "Não informado";
+        map.set(key, (map.get(key) || 0) + 1);
+      });
+      return map;
+    }
+
+    function setSelectOptions(selectEl, values) {
+      const prev = selectEl.value;
+      selectEl.innerHTML = `<option value="${FILTER_ALL}">Todos</option>`;
+      values.forEach((v) => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        selectEl.appendChild(opt);
+      });
+      if ([...selectEl.options].some((o) => o.value === prev)) {
+        selectEl.value = prev;
+      } else {
+        selectEl.value = FILTER_ALL;
+      }
+    }
+    function buildTabs() {
+      refs.tabsBar.innerHTML = "";
+      state.workbookSheets.forEach((sheet, index) => {
+        const btn = document.createElement("button");
+        btn.className = "tab-btn";
+        btn.textContent = `${sheet.name} (${sheet.analysis.summary.totalRows})`;
+        btn.dataset.sheet = sheet.name;
+        btn.addEventListener("click", () => openSheetTab(sheet.name));
+        if (index === 0) btn.classList.add("active");
+        refs.tabsBar.appendChild(btn);
+      });
+    }
+
+    function openSheetTab(sheetName) {
+      state.active = sheetName;
+      refs.tabsBar.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.sheet === sheetName);
+      });
+
+      state.filters = { year: FILTER_ALL, month: FILTER_ALL, status: FILTER_ALL, owner: FILTER_ALL, category: FILTER_ALL };
+      state.table.search = "";
+      state.table.page = 1;
+      refs.tableSearch.value = "";
+      refs.pageSize.value = String(state.table.pageSize);
+
+      populateFiltersForSheet();
+      renderActiveSheet();
+    }
+
+    function getActiveAnalysis() {
+      if (!state.active) return null;
+      return state.byName[state.active]?.analysis || null;
+    }
+
+    function populateFiltersForSheet() {
+      const analysis = getActiveAnalysis();
+      if (!analysis) return;
+      const records = analysis.records;
+
+      const years = [...new Set(records.map((r) => r.__year).filter(Boolean))].sort();
+      const months = [...new Set(records.map((r) => r.__month).filter(Boolean))].sort();
+      const status = [...new Set(records.map((r) => r.__status).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+      const owners = [...new Set(records.map((r) => r.__owner).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+      const categories = [...new Set(records.map((r) => r.__category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+      setSelectOptions(refs.yearFilter, years);
+      setSelectOptions(refs.monthFilter, months.map((m) => m === "Sem data" ? m : `${m} | ${monthLabel(m)}`));
+      setSelectOptions(refs.statusFilter, status);
+      setSelectOptions(refs.ownerFilter, owners);
+      setSelectOptions(refs.categoryFilter, categories);
+
+      refs.yearFilter.value = FILTER_ALL;
+      refs.monthFilter.value = FILTER_ALL;
+      refs.statusFilter.value = FILTER_ALL;
+      refs.ownerFilter.value = FILTER_ALL;
+      refs.categoryFilter.value = FILTER_ALL;
+      refs.sheetTitle.textContent = `Filtros | Aba: ${analysis.sheetName}`;
+    }
+
+    function applySheetFilters(records) {
+      const monthFilterRaw = refs.monthFilter.value;
+      const monthFilter = monthFilterRaw === FILTER_ALL ? FILTER_ALL : monthFilterRaw.split(" | ")[0];
+      return records.filter((r) => {
+        if (refs.yearFilter.value !== FILTER_ALL && r.__year !== refs.yearFilter.value) return false;
+        if (monthFilter !== FILTER_ALL && r.__month !== monthFilter) return false;
+        if (refs.statusFilter.value !== FILTER_ALL && r.__status !== refs.statusFilter.value) return false;
+        if (refs.ownerFilter.value !== FILTER_ALL && r.__owner !== refs.ownerFilter.value) return false;
+        if (refs.categoryFilter.value !== FILTER_ALL && r.__category !== refs.categoryFilter.value) return false;
+        return true;
+      });
+    }
+
+    function renderActiveSheet() {
+      const analysis = getActiveAnalysis();
+      if (!analysis) return;
+      const filtered = applySheetFilters(analysis.records);
+      analysis.__filtered = filtered;
+
+      const activeFilters = [
+        refs.yearFilter.value !== FILTER_ALL ? `Ano=${refs.yearFilter.value}` : null,
+        refs.monthFilter.value !== FILTER_ALL ? `Mês=${refs.monthFilter.value}` : null,
+        refs.statusFilter.value !== FILTER_ALL ? `Status=${refs.statusFilter.value}` : null,
+        refs.ownerFilter.value !== FILTER_ALL ? `Responsável=${refs.ownerFilter.value}` : null,
+        refs.categoryFilter.value !== FILTER_ALL ? `Categoria=${refs.categoryFilter.value}` : null
+      ].filter(Boolean);
+      refs.filtersSummary.textContent = `${activeFilters.length ? `Filtros ativos: ${activeFilters.join(" | ")}.` : "Sem filtros ativos."} ${filtered.length} registros no recorte.`;
+
+      renderKpis(analysis, filtered);
+      renderInsights(analysis);
+      renderDictionary(analysis);
+      renderCharts(analysis, filtered);
+      renderTable();
+    }
+
+    function renderKpis(analysis, filtered) {
+      const statusCounts = countBy(filtered, (r) => r.__status);
+      const total = filtered.length;
+      const concluded = statusCounts.get("Concluída") || 0;
+      const pending = filtered.filter((r) => r.__pending).length;
+      const evidence = filtered.filter((r) => r.__hasEvidence === "Sim").length;
+
+      const items = [
+        { label: "Registros", value: total, note: `de ${analysis.summary.totalRows} na aba`, cls: "" },
+        { label: "Colunas", value: analysis.summary.totalColumns, note: "detectadas no cabeçalho", cls: "" },
+        { label: "Completude", value: `${(analysis.summary.completion * 100).toFixed(1).replace(".", ",")}%`, note: "células preenchidas", cls: "" },
+        { label: "Concluídas", value: concluded, note: total ? `${((concluded / total) * 100).toFixed(1).replace(".", ",")}% do recorte` : "0%", cls: "good" },
+        { label: "Pendentes", value: pending, note: total ? `${((pending / total) * 100).toFixed(1).replace(".", ",")}% do recorte` : "0%", cls: "warn" },
+        { label: "Com evidência", value: evidence, note: total ? `${((evidence / total) * 100).toFixed(1).replace(".", ",")}% do recorte` : "0%", cls: "" }
+      ];
+
+      refs.kpiGrid.innerHTML = items.map((k) => `
+        <article class="kpi ${k.cls}">
+          <div class="kpi__label">${escapeHtml(k.label)}</div>
+          <div class="kpi__value">${escapeHtml(String(k.value))}</div>
+          <div class="kpi__note">${escapeHtml(k.note)}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderInsights(analysis) {
+      refs.insightsList.innerHTML = (analysis.insights || []).map((i) => `<li>${escapeHtml(i)}</li>`).join("");
+    }
+
+    function renderDictionary(analysis) {
+      refs.dictionaryBody.innerHTML = (analysis.profiles || []).map((p) => `
+        <tr>
+          <td>${escapeHtml(p.name)}</td>
+          <td>${escapeHtml(p.type)}</td>
+          <td>${p.missing}</td>
+          <td>${p.distinct}</td>
+        </tr>
+      `).join("");
+    }
+
+    function upsertChart(key, canvasId, config) {
+      if (typeof Chart === "undefined") {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const wrap = canvas.parentElement;
+        canvas.classList.add("hidden");
+        if (!wrap.querySelector(".fallback")) {
+          const div = document.createElement("div");
+          div.className = "fallback";
+          div.textContent = "Chart.js indisponível neste navegador.";
+          wrap.appendChild(div);
+        }
+        return;
+      }
+
+      if (state.charts[key]) state.charts[key].destroy();
+      const ctx = document.getElementById(canvasId);
+      if (!ctx) return;
+      state.charts[key] = new Chart(ctx, config);
+    }
+
+    function renderCharts(analysis, filtered) {
+      const statusMap = countBy(filtered, (r) => r.__status);
+      const statusLabels = STATUS_ORDER.filter((s) => statusMap.has(s));
+      const statusData = statusLabels.map((s) => statusMap.get(s) || 0);
+
+      upsertChart("status", "statusChart", {
+        type: "bar",
+        data: {
+          labels: statusLabels,
+          datasets: [{
+            data: statusData,
+            backgroundColor: statusLabels.map((s) => STATUS_COLORS[s] || "#96a5b7"),
+            borderRadius: 8
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+          }
+        }
+      });
+
+      const monthKeys = [...new Set(filtered.map((r) => r.__month).filter((m) => m && m !== "Sem data"))].sort();
+      const monthlyTotal = monthKeys.map((k) => filtered.filter((r) => r.__month === k).length);
+      const monthlyDone = monthKeys.map((k) => filtered.filter((r) => r.__month === k && r.__status === "Concluída").length);
+
+      upsertChart("trend", "trendChart", {
+        type: "line",
+        data: {
+          labels: monthKeys.map((k) => monthLabel(k)),
+          datasets: [
+            { label: "Total", data: monthlyTotal, borderColor: "#2f6db3", backgroundColor: "#2f6db3", tension: 0.25, fill: false },
+            { label: "Concluídas", data: monthlyDone, borderColor: "#108455", backgroundColor: "#108455", tension: 0.25, fill: false }
+          ]
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "bottom" } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+
+      const ownerTop = [...countBy(filtered.filter((r) => r.__pending), (r) => r.__owner).entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+      upsertChart("owner", "ownerChart", {
+        type: "bar",
+        data: {
+          labels: ownerTop.map((x) => x[0].length > 32 ? `${x[0].slice(0, 31)}…` : x[0]),
+          datasets: [{ data: ownerTop.map((x) => x[1]), backgroundColor: "#4b75a4", borderRadius: 8 }]
+        },
+        options: {
+          indexAxis: "y",
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false } } }
+        }
+      });
+
+      const qualityTop = analysis.qualityTopMissing || [];
+      upsertChart("quality", "qualityChart", {
+        type: "bar",
+        data: {
+          labels: qualityTop.map((q) => q.name.length > 28 ? `${q.name.slice(0, 27)}…` : q.name),
+          datasets: [{ data: qualityTop.map((q) => q.missing), backgroundColor: "#d6811d", borderRadius: 8 }]
+        },
+        options: {
+          indexAxis: "y",
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false } } }
+        }
+      });
+    }
+
+    function pillForStatus(status) {
+      if (status === "Concluída") return "p-good";
+      if (status === "Não iniciada") return "p-warn";
+      if (status === "Em tratamento") return "p-info";
+      if (status === "Ação corretiva (RTA)") return "p-bad";
+      return "p-na";
+    }
+
+    function getFilteredAndSearchedRows() {
+      const analysis = getActiveAnalysis();
+      if (!analysis) return [];
+      const filtered = analysis.__filtered || [];
+      const search = normalizeText(state.table.search || "");
+      const rows = search
+        ? filtered.filter((r) => normalizeText(Object.values(r).map((v) => cleanText(v)).join(" ")).includes(search))
+        : [...filtered];
+
+      const sortKey = state.table.sortKey;
+      rows.sort((a, b) => {
+        const av = a[sortKey];
+        const bv = b[sortKey];
+        const cmp = compareValues(av, bv);
+        return state.table.sortDir === "asc" ? cmp : -cmp;
+      });
+      return rows;
+    }
+
+    function compareValues(a, b) {
+      const an = parseNumber(a);
+      const bn = parseNumber(b);
+      if (an !== null && bn !== null) return an - bn;
+      const ad = parseDate(a);
+      const bd = parseDate(b);
+      if (ad && bd) return ad - bd;
+      return cleanText(a).localeCompare(cleanText(b), "pt-BR", { sensitivity: "base" });
+    }
+
+    function renderTable() {
+      const analysis = getActiveAnalysis();
+      if (!analysis) return;
+
+      const rows = getFilteredAndSearchedRows();
+      const cols = analysis.displayColumns || analysis.headers.slice(0, 8);
+
+      refs.detailHead.innerHTML = `<tr>${cols.map((c) => `<th class="sortable" data-col="${escapeHtml(c)}">${escapeHtml(c)}</th>`).join("")}</tr>`;
+
+      refs.detailHead.querySelectorAll("th.sortable").forEach((th) => {
+        const col = th.dataset.col;
+        if (state.table.sortKey === col) th.classList.add(state.table.sortDir);
+        th.addEventListener("click", () => {
+          if (state.table.sortKey === col) {
+            state.table.sortDir = state.table.sortDir === "asc" ? "desc" : "asc";
+          } else {
+            state.table.sortKey = col;
+            state.table.sortDir = "asc";
+          }
+          renderTable();
+        });
+      });
+
+      const total = rows.length;
+      const pages = Math.max(1, Math.ceil(total / state.table.pageSize));
+      if (state.table.page > pages) state.table.page = pages;
+      const start = (state.table.page - 1) * state.table.pageSize;
+      const pageRows = rows.slice(start, start + state.table.pageSize);
+
+      refs.detailBody.innerHTML = pageRows.map((r) => `<tr>${cols.map((c) => renderCell(c, r[c], r)).join("")}</tr>`).join("");
+
+      const from = total ? start + 1 : 0;
+      const to = Math.min(total, start + state.table.pageSize);
+      refs.tableMeta.textContent = `${from}-${to} de ${total} | pág. ${state.table.page}/${pages}`;
+      refs.prevPageBtn.disabled = state.table.page <= 1;
+      refs.nextPageBtn.disabled = state.table.page >= pages;
+    }
+
+    function renderCell(column, value, row) {
+      const txt = cleanText(value) || "-";
+      if (column === getActiveAnalysis().keyColumns.statusCol) {
+        const st = row.__status;
+        return `<td><span class="pill ${pillForStatus(st)}">${escapeHtml(st)}</span></td>`;
+      }
+      if (column === getActiveAnalysis().keyColumns.dateCol) {
+        return `<td>${escapeHtml(formatDate(parseDate(value)))}</td>`;
+      }
+      return `<td title="${escapeHtml(txt)}">${escapeHtml(txt.length > 110 ? `${txt.slice(0, 109)}…` : txt)}</td>`;
+    }
+
+    function exportFilteredCsv() {
+      const analysis = getActiveAnalysis();
+      if (!analysis) return;
+      const rows = getFilteredAndSearchedRows();
+      if (!rows.length) return;
+
+      const cols = analysis.displayColumns || analysis.headers;
+      const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const csv = [
+        cols.join(";"),
+        ...rows.map((r) => cols.map((c) => esc(r[c])).join(";"))
+      ].join("\n");
+
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${state.active || "aba"}_filtrado.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function resetDashboard() {
+      Object.values(state.charts).forEach((chart) => {
+        try { chart.destroy(); } catch (_) {}
+      });
+      state.charts = {};
+      state.workbookName = "";
+      state.workbookSheets = [];
+      state.byName = {};
+      state.active = null;
+      state.filters = { year: FILTER_ALL, month: FILTER_ALL, status: FILTER_ALL, owner: FILTER_ALL, category: FILTER_ALL };
+      state.table = { search: "", pageSize: 25, page: 1, sortKey: "__rowIndex", sortDir: "asc" };
+
+      refs.fileMeta.textContent = "Nenhum arquivo carregado";
+      refs.lastUpdate.textContent = "-";
+      refs.tabsBar.innerHTML = "";
+      refs.tabsCard.classList.add("hidden");
+      refs.dashboardCard.classList.add("hidden");
+      refs.emptyState.classList.remove("hidden");
+      refs.kpiGrid.innerHTML = "";
+      refs.insightsList.innerHTML = "";
+      refs.dictionaryBody.innerHTML = "";
+      refs.detailHead.innerHTML = "";
+      refs.detailBody.innerHTML = "";
+      refs.filtersSummary.textContent = "Sem filtros ativos.";
+      refs.fileInput.value = "";
+
+      setStatus("Aguardando upload", "info");
+    }
+
+    initInteractions();
+
+    if (typeof XLSX === "undefined") {
+      setStatus("Biblioteca XLSX indisponível no navegador. Sem ela não é possível ler o Excel no cliente.", "bad");
+    } else {
+      setStatus("Pronto para receber o arquivo Excel.", "info");
+    }
+  </script>
+</body>
+</html>
